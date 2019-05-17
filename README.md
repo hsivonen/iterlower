@@ -20,6 +20,10 @@ online.
 
 ## Release Notes
 
+### 1.0.1
+
+* Fixed Cargo.toml metadata.
+
 ### 1.0.0
 
 * Initial release.

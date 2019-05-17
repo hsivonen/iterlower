@@ -10,7 +10,7 @@
 //! Final-sigma-correct lowercasing iterator adapter for iterators
 //! over `char`. Turkish/Azeri `'I'` handled optionally.
 
-#![doc(html_root_url = "https://docs.rs/iterlower/1.0.0")]
+#![doc(html_root_url = "https://docs.rs/iterlower/1.0.1")]
 
 use std::char::ToLowercase;
 use std::collections::VecDeque;
