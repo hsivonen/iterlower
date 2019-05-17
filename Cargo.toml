@@ -1,0 +1,16 @@
+[package]
+name = "iterlower"
+description = "Final-sigma-correct lowercasing iterator adapter with option for Turkish/Azeri I behavior"
+version = "1.0.0"
+authors = ["Henri Sivonen <hsivonen@hsivonen.fi>"]
+edition = "2018"
+license = "MIT/Apache-2.0"
+readme = "README.md"
+documentation = "https://docs.rs/encoding_rs/"
+homepage = "https://docs.rs/encoding_rs/"
+repository = "https://github.com/hsivonen/encoding_rs"
+keywords = ["unicode", "greek", "turkish", "azeri"]
+categories = ["text-processing", "internationalization"]
+
+[dependencies]
+unic-ucd = "0.9.0"
