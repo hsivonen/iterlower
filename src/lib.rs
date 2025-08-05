@@ -57,7 +57,7 @@ impl<I: Iterator<Item = char>> Iterator for Lowercase<I> {
                     if let Some(t) = self.delegate.next() {
                         if CaseIgnorable::of(t).as_bool() {
                             self.sigma_trailing_case_ignorables.push_back(t);
-                            continue;;
+                            continue;
                         }
                         self.sigma_trail = Some(t);
                         if Cased::of(t).as_bool() {
