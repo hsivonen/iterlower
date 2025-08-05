@@ -13,4 +13,4 @@ keywords = ["unicode", "greek", "turkish", "azeri"]
 categories = ["text-processing", "internationalization"]
 
 [dependencies]
-unic-ucd = "0.9.0"
+icu_properties = "2.0.1"

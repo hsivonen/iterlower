@@ -10,12 +10,12 @@
 //! Final-sigma-correct lowercasing iterator adapter for iterators
 //! over `char`. Turkish/Azeri `'I'` handled optionally.
 
-#![doc(html_root_url = "https://docs.rs/iterlower/1.0.1")]
+#![no_std]
 
-use std::char::ToLowercase;
-use std::collections::VecDeque;
-use unic_ucd::CaseIgnorable;
-use unic_ucd::Cased;
+extern crate alloc;
+
+use alloc::collections::VecDeque;
+use core::char::ToLowercase;
 
 /// An iterator adapter yielding lower-case `char`s.
 #[derive(Debug)]
@@ -26,6 +26,8 @@ pub struct Lowercase<I> {
     lower: ToLowercase,
     prev_cased: bool,
     tr_az: bool,
+    cased: icu_properties::CodePointSetDataBorrowed<'static>,
+    case_ignorable: icu_properties::CodePointSetDataBorrowed<'static>,
 }
 
 impl<I: Iterator<Item = char>> Iterator for Lowercase<I> {
@@ -51,16 +53,16 @@ impl<I: Iterator<Item = char>> Iterator for Lowercase<I> {
             self.prev_cased = true;
             return Some('ı');
         }
-        if Cased::of(c).as_bool() {
+        if self.cased.contains(c) {
             if c == 'Σ' && self.prev_cased {
                 loop {
                     if let Some(t) = self.delegate.next() {
-                        if CaseIgnorable::of(t).as_bool() {
+                        if self.case_ignorable.contains(t) {
                             self.sigma_trailing_case_ignorables.push_back(t);
                             continue;
                         }
                         self.sigma_trail = Some(t);
-                        if Cased::of(t).as_bool() {
+                        if self.cased.contains(t) {
                             return Some('σ');
                         }
                     }
@@ -71,7 +73,7 @@ impl<I: Iterator<Item = char>> Iterator for Lowercase<I> {
             self.lower = c.to_lowercase();
             return self.lower.next();
         }
-        if self.prev_cased && !CaseIgnorable::of(c).as_bool() {
+        if self.prev_cased && !self.case_ignorable.contains(c) {
             self.prev_cased = false;
         }
         Some(c)
@@ -103,6 +105,10 @@ impl<I: Iterator<Item = char>> IterLowercase<I> for I {
             lower: lower,
             prev_cased: false,
             tr_az: tr_az,
+            cased: icu_properties::CodePointSetData::new::<icu_properties::props::Cased>(),
+            case_ignorable: icu_properties::CodePointSetData::new::<
+                icu_properties::props::CaseIgnorable,
+            >(),
         }
     }
 }
@@ -110,6 +116,7 @@ impl<I: Iterator<Item = char>> IterLowercase<I> for I {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::String;
     fn check(s: &str) {
         assert_eq!(
             s.chars().to_lowercase(false).collect::<String>(),
@@ -153,15 +160,11 @@ mod tests {
 
     #[test]
     fn test_i() {
-        assert_eq!(
-            "ΣIΣ".chars().to_lowercase(true).collect::<String>(),
-            "σıς"
-        );
+        assert_eq!("ΣIΣ".chars().to_lowercase(true).collect::<String>(), "σıς");
     }
 
     #[test]
     fn test_uncased() {
         check("猪猪");
     }
-
 }
